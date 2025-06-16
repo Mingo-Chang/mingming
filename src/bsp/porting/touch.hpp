@@ -1,10 +1,10 @@
 /**
  * @file CTP_FT6336.cpp
  * @brief FT6336 Touch Screen Driver
- * @version 0.1
- * @date 2024
+ * @version 
+ * @date 
  * 
- * @copyright Copyright (c) 2024
+ * @copyright
  */
 #pragma once
 #include "Arduino.h"

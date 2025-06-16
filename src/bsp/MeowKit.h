@@ -1,11 +1,11 @@
 /**
- * @file hal_rachel.h
- * @author Forairaaaaa
+ * @file 
+ * @author 
  * @brief
- * @version 0.1
- * @date 2023-11-07
+ * @version 
+ * @date 
  *
- * @copyright Copyright (c) 2023
+ * @copyright
  *
  */
 #pragma once
@@ -17,5 +17,5 @@ private:
 
 public:
     CTP ctp;
-    
+
 };
