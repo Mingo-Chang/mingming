@@ -1,5 +1,7 @@
 #include "MeowKit.h"
 
-void setup() { MeowKit::Setup(); }
+MeowKit meowkit;
 
-void loop() { MeowKit::Loop(); }
+void setup() { meowkit.Setup(); }
+
+void loop() { meowkit.Loop(); }

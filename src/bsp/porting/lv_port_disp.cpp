@@ -182,7 +182,10 @@ void lv_port_disp_init(LGFX* lcd)
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
-    _lcd->clear();
+    _lcd->init();
+    _lcd->setBrightness(15);
+    _lcd->setRotation(0);
+    _lcd->fillScreen(TFT_BLACK);
 }
 
 volatile bool disp_flush_enabled = true;
@@ -209,9 +212,9 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 
     uint32_t w = ( area->x2 - area->x1 + 1 );
     uint32_t h = ( area->y2 - area->y1 + 1 );
-    _lcd->setAddrWindow( area->x1, area->y1, w, h );
     _lcd->startWrite();
-    _lcd->writePixels((uint16_t*)&color_p->full, w * h, true);
+    _lcd->setAddrWindow( area->x1, area->y1, w, h );
+    _lcd->writePixels((lgfx::rgb565_t *)&color_p->full, w * h);
     _lcd->endWrite(); 
 
     /*IMPORTANT!!!

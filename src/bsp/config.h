@@ -36,3 +36,7 @@
 // I2C
 #define HAL_PIN_I2C_SCL 2
 #define HAL_PIN_I2C_SDA 1
+
+/* Common configs */
+#define BSP_VERISON                "v1.0"
+#define PROJECT_NAME               "MeowKit"

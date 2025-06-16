@@ -7,7 +7,7 @@ class LGFX : public lgfx::LGFX_Device
     lgfx::Panel_ST7789      _panel_instance;
     lgfx::Bus_SPI        _bus_instance;   // SPIバスのインスタンス
     lgfx::Light_PWM     _light_instance;
-    lgfx::Touch_FT5x06           _touch_instance; // FT6336
+    // lgfx::Touch_FT5x06           _touch_instance; // FT6336
 
 public:
 
@@ -104,35 +104,35 @@ public:
       _panel_instance.setLight(&_light_instance);  // バックライトをパネルにセットします。
     }
 
-    { // タッチスクリーン制御の設定を行います。（必要なければ削除）
-      auto cfg = _touch_instance.config();
+//     { // タッチスクリーン制御の設定を行います。（必要なければ削除）
+//       auto cfg = _touch_instance.config();
 
-      cfg.x_min      = 0;    // タッチスクリーンから得られる最小のX値(生の値)
-      cfg.x_max      = 239;  // タッチスクリーンから得られる最大のX値(生の値)
-      cfg.y_min      = 0;    // タッチスクリーンから得られる最小のY値(生の値)
-      cfg.y_max      = 319;  // タッチスクリーンから得られる最大のY値(生の値)
-      cfg.pin_int    = -1;   // INTが接続されているピン番号
-      cfg.bus_shared = false; // 如果使用与屏幕相同的总线，则设置为 true
-      cfg.offset_rotation = 3;// 表示とタッチの向きのが一致しない場合の調整 0~7の値で設定
+//       cfg.x_min      = 0;    // タッチスクリーンから得られる最小のX値(生の値)
+//       cfg.x_max      = 239;  // タッチスクリーンから得られる最大のX値(生の値)
+//       cfg.y_min      = 0;    // タッチスクリーンから得られる最小のY値(生の値)
+//       cfg.y_max      = 319;  // タッチスクリーンから得られる最大のY値(生の値)
+//       cfg.pin_int    = -1;   // INTが接続されているピン番号
+//       cfg.bus_shared = false; // 如果使用与屏幕相同的总线，则设置为 true
+//       cfg.offset_rotation = 3;// 表示とタッチの向きのが一致しない場合の調整 0~7の値で設定
 
-// SPI接続の場合
-    //   cfg.spi_host = VSPI_HOST;// 使用するSPIを選択 (HSPI_HOST or VSPI_HOST)
-    //   cfg.freq = 1000000;     // SPIクロックを設定
-    //   cfg.pin_sclk = 18;     // SCLKが接続されているピン番号
-    //   cfg.pin_mosi = 23;     // MOSIが接続されているピン番号
-    //   cfg.pin_miso = 19;     // MISOが接続されているピン番号
-    //   cfg.pin_cs   =  5;     //   CSが接続されているピン番号
+// // SPI接続の場合
+//     //   cfg.spi_host = VSPI_HOST;// 使用するSPIを選択 (HSPI_HOST or VSPI_HOST)
+//     //   cfg.freq = 1000000;     // SPIクロックを設定
+//     //   cfg.pin_sclk = 18;     // SCLKが接続されているピン番号
+//     //   cfg.pin_mosi = 23;     // MOSIが接続されているピン番号
+//     //   cfg.pin_miso = 19;     // MISOが接続されているピン番号
+//     //   cfg.pin_cs   =  5;     //   CSが接続されているピン番号
 
-// I2C接続の場合
-      cfg.i2c_port = 1;      // 使用するI2Cを選択 (0 or 1)
-      cfg.i2c_addr = 0x38;   // I2Cデバイスアドレス番号
-      cfg.pin_sda  = HAL_PIN_I2C_SDA;     // SDAが接続されているピン番号
-      cfg.pin_scl  = HAL_PIN_I2C_SCL;     // SCLが接続されているピン番号
-      cfg.freq = 400000;     // I2Cクロックを設定
+// // I2C接続の場合
+//       cfg.i2c_port = 1;      // 使用するI2Cを選択 (0 or 1)
+//       cfg.i2c_addr = 0x38;   // I2Cデバイスアドレス番号
+//       cfg.pin_sda  = HAL_PIN_I2C_SDA;     // SDAが接続されているピン番号
+//       cfg.pin_scl  = HAL_PIN_I2C_SCL;     // SCLが接続されているピン番号
+//       cfg.freq = 400000;     // I2Cクロックを設定
 
-      _touch_instance.config(cfg);
-      _panel_instance.setTouch(&_touch_instance);  // タッチスクリーンをパネルにセットします。
-    }
+//       _touch_instance.config(cfg);
+//       _panel_instance.setTouch(&_touch_instance);  // タッチスクリーンをパネルにセットします。
+//     }
 
 
     setPanel(&_panel_instance); // 使用するパネルをセットします。

@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 #include <Wire.h>
 
@@ -10,7 +11,7 @@ class PCA9557 {
         bool write_register(uint8_t reg, uint8_t value) ;
 
     public:
-        PCA9557(int address = 0x18, TwoWire *bus = &Wire) ; // 0x18 => A0, A1, A2 connect to GND
+        PCA9557(int address = 0x19, TwoWire *bus = &Wire) ; // 0x18 => A0, A1, A2 connect to GND
 
         bool pinMode(int pin, int mode) ;
         bool digitalWrite(int pin, int value) ;

@@ -1,8 +1,19 @@
 #pragma once
+#include <PCA9557.h>
+#include "lvgl.h"
+#include "ui/ui.h"
+#include <mooncake.h>
+#include "bsp/devices.h"
+#include "bsp/porting/lv_port_disp.h"
+#include "bsp/porting/lv_port_indev.h"
 
-namespace MeowKit
+
+class MeowKit
 {
-    void Setup();
-    void Loop();
-    void Destroy();
-} // namespace RACHEL
+    private:
+        DEVICES* _device;
+    public:
+        void Setup();
+        void Loop();
+        void Destroy();
+};

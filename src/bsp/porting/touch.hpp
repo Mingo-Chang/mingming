@@ -95,7 +95,7 @@ class CTP {
 
             // Disable auto-sleep on FT6336
             _I2C_write1Byte(0xFE, 0x07);
-            Serial0.println("[CTP] Auto-sleep disabled");
+           printf("[CTP] Auto-sleep disabled");
         }
 
         inline void _reset_coor()
