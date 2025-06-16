@@ -1,13 +1,16 @@
-#include "lvgl.h"
-#include "../hal_MeowKit.h"
-#include <Arduino.h>
-#include "../hal_config.h"
+/**
+ * @file lv_port_disp_templ.c
+ *
+ */
 
-#define MY_DISP_HOR_RES 320
-#define MY_DISP_VER_RES 240
-#define LV_VER_RES_MAX  320
+/*Copy this file as "lv_port_disp.c" and set this value to "1" to enable content*/
+#if 1
 
-#define LVGL_USE_PSRAM 1
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_port_disp.h"
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -22,89 +25,76 @@
     #define MY_DISP_VER_RES    240
 #endif
 
-class LGFX_MeowKit : public lgfx::LGFX_Device
-{
-    lgfx::Panel_ST7789 _panel_instance;
-    lgfx::Bus_SPI _bus_instance;
-    lgfx::Light_PWM _light_instance;
-
-public:
-    LGFX_MeowKit(void)
-    {
-        {
-            auto cfg = _bus_instance.config();
-
-            cfg.spi_host = SPI2_HOST;
-            cfg.spi_mode = 0;
-            cfg.freq_write = 80000000;
-            cfg.freq_read  = 16000000;
-            cfg.spi_3wire  = false; 
-            cfg.use_lock   = true;
-            cfg.dma_channel = SPI_DMA_CH_AUTO;
-            cfg.pin_mosi = HAL_PIN_LCD_MOSI;
-            cfg.pin_miso = HAL_PIN_SD_MISO;
-            cfg.pin_sclk = HAL_PIN_LCD_SCLK;
-            cfg.pin_dc = HAL_PIN_LCD_DC;
-
-            _bus_instance.config(cfg);
-            _panel_instance.setBus(&_bus_instance);
-        }
-        {
-            auto cfg = _panel_instance.config();
-
-            cfg.pin_cs = HAL_PIN_LCD_CS;
-            cfg.pin_rst = HAL_PIN_LCD_RST;
-            cfg.pin_busy = HAL_PIN_LCD_BUSY;
-            cfg.panel_width = 240;
-            cfg.panel_height = 320;
-            cfg.offset_x = 0;
-            cfg.offset_y = 0;
-            cfg.offset_rotation  =     3;
-            cfg.dummy_read_pixel =     8;
-            cfg.dummy_read_bits  =     1;
-            cfg.readable         =  false;
-            cfg.invert           = true;
-            cfg.rgb_order        = false;
-            cfg.dlen_16bit       = false;
-            cfg.bus_shared       = false;
-
-            _panel_instance.config(cfg);
-        }
-        {
-            auto cfg = _light_instance.config();
-
-            cfg.pin_bl = HAL_PIN_LCD_BL;
-            cfg.invert = false;
-            cfg.freq = 44100;
-            cfg.pwm_channel = 7;
-
-            _light_instance.config(cfg);
-            _panel_instance.setLight(&_light_instance);
-        }
-
-        setPanel(&_panel_instance);
-    }
-};
-
-static LGFX_MeowKit _display;
+/**********************
+ *      TYPEDEFS
+ **********************/
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void disp_init(void)
-{
-    
-}
+static void disp_init(void);
 
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-//static void gpu_fill(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
-//        const lv_area_t * fill_area, lv_color_t color);
 
+/**********************
+ *  STATIC VARIABLES
+ **********************/
 
-void HAL_MeowKit::_disp_init()
+static LGFX* _lcd;
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+void lv_port_disp_init(LGFX* lcd)
 {
-    printf("display init");
+    /*-------------------------
+     * Initialize your display
+     * -----------------------*/
+    _lcd = lcd;
     disp_init();
+
+    /*-----------------------------
+     * Create a buffer for drawing
+     *----------------------------*/
+
+    /**
+     * LVGL requires a buffer where it internally draws the widgets.
+     * Later this buffer will passed to your display driver's `flush_cb` to copy its content to your display.
+     * The buffer has to be greater than 1 display row
+     *
+     * There are 3 buffering configurations:
+     * 1. Create ONE buffer:
+     *      LVGL will draw the display's content here and writes it to your display
+     *
+     * 2. Create TWO buffer:
+     *      LVGL will draw the display's content to a buffer and writes it your display.
+     *      You should use DMA to write the buffer's content to the display.
+     *      It will enable LVGL to draw the next part of the screen to the other buffer while
+     *      the data is being sent form the first buffer. It makes rendering and flushing parallel.
+     *
+     * 3. Double buffering
+     *      Set 2 screens sized buffers and set disp_drv.full_refresh = 1.
+     *      This way LVGL will always provide the whole rendered screen in `flush_cb`
+     *      and you only need to change the frame buffer's address.
+     */
+
+    /* Example for 1) */
+    // static lv_disp_draw_buf_t draw_buf_dsc_1;
+    // static lv_color_t buf_1[MY_DISP_HOR_RES * 120];                          /*A buffer for 10 rows*/
+    // lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES);   /*Initialize the display buffer*/
+
+
+    /* Example for 2) */
+    // static lv_disp_draw_buf_t draw_buf_dsc_2;
+    // static lv_color_t buf_2_1[MY_DISP_HOR_RES * 24];                        /*A buffer for 10 rows*/
+    // static lv_color_t buf_2_2[MY_DISP_HOR_RES * 24];                        /*An other buffer for 10 rows*/
+    // lv_disp_draw_buf_init(&draw_buf_dsc_2, buf_2_1, buf_2_2, MY_DISP_HOR_RES * 24);   /*Initialize the display buffer*/
+
     #if LVGL_USE_PSRAM
 
     /* Example for 3) also set disp_drv.full_refresh = 1 below*/
@@ -119,12 +109,12 @@ void HAL_MeowKit::_disp_init()
 
     /* If something wrong */
     if ((buf_3_1 == NULL) || (buf_3_2 == NULL)) {
-        Serial0.printf("[LVGL] malloc buffer from PSRAM error\r\n");
+        printf("[LVGL] malloc buffer from PSRAM error\r\n");
         while (1)
             delay(1000);
     } else {
-        Serial0.printf("[LVGL] malloc buffer from PSRAM successful\r\n");
-        Serial0.printf("[LVGL] free PSRAM: %d\r\n", ESP.getFreePsram());
+        printf("[LVGL] malloc buffer from PSRAM successful\r\n");
+        printf("[LVGL] free PSRAM: %d\r\n", ESP.getFreePsram());
     }
     
     lv_disp_draw_buf_init(&draw_buf_dsc_3, buf_3_1, buf_3_2,
@@ -185,7 +175,15 @@ void HAL_MeowKit::_disp_init()
     lv_disp_drv_register(&disp_drv);
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
+/*Initialize your display and the required peripherals.*/
+static void disp_init(void)
+{
+    _lcd->clear();
+}
 
 volatile bool disp_flush_enabled = true;
 
@@ -208,30 +206,22 @@ void disp_disable_update(void)
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    // if(disp_flush_enabled) {
-        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
 
-        // int32_t x;
-        // int32_t y;
-        // for(y = area->y1; y <= area->y2; y++) {
-        //     for(x = area->x1; x <= area->x2; x++) {
-        //         /*Put a pixel to the display. For example:*/
-        //         /*put_px(x, y, *color_p)*/
-        //         color_p++;
-        //     }
-        // }
-
-        uint32_t w = ( area->x2 - area->x1 + 1 );
-        uint32_t h = ( area->y2 - area->y1 + 1 );
-
-        _display.startWrite();
-        _display.setAddrWindow( area->x1, area->y1, w, h );
-        //tft.pushPixels( ( uint16_t * )&color_p->full, w * h, true );
-        _display.writePixels((lgfx::rgb565_t *)&color_p->full, w * h);
-        _display.endWrite();
-    // }
+    uint32_t w = ( area->x2 - area->x1 + 1 );
+    uint32_t h = ( area->y2 - area->y1 + 1 );
+    _lcd->setAddrWindow( area->x1, area->y1, w, h );
+    _lcd->startWrite();
+    _lcd->writePixels((uint16_t*)&color_p->full, w * h, true);
+    _lcd->endWrite(); 
 
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
     lv_disp_flush_ready(disp_drv);
 }
+
+
+#else /*Enable this file at the top*/
+
+/*This dummy typedef exists purely to silence -Wpedantic.*/
+typedef int keep_pedantic_happy;
+#endif
