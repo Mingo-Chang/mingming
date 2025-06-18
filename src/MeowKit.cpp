@@ -27,18 +27,17 @@ void MeowKit::Setup()
     _device->init();
 
     /* Init lvgl */
-    lv_init();
-    lv_port_disp_init(&_device->Lcd);
-    lv_port_indev_init(&_device->ctp);
+    // lv_init();
+    // lv_port_disp_init(&_device->Lcd);
+    // lv_port_indev_init(&_device->ctp);
 
     /* Init ui */
-    ui_init();
-
+    // ui_init();
 }
 
 void MeowKit::Loop() 
 { 
-    lv_timer_handler();delay(5); 
+    // lv_timer_handler();delay(5); 
 }
 
 void MeowKit::Destroy()
