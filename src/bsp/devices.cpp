@@ -32,7 +32,7 @@ void DEVICES::init()
 
     // /* Init I2C */
     Wire.begin(HAL_PIN_I2C_SDA,HAL_PIN_I2C_SCL);
-    Wire.setClock(100000);
+    Wire.setClock(400000);
 
     /* Init PCA9557PW_LCD_CS */
     PCA9557 io(0x19, &Wire); // 0x19 for iFarm4G board
@@ -50,35 +50,38 @@ void DEVICES::init()
     
     /* Init SD_MMC*/
     sd.init();
-    // 写文件
-    File file = SD_MMC.open("/test.txt", FILE_WRITE);
-    if (file) {
-        file.println("Hello, ESP32-S3 SDMMC 1bit!");
-        file.close();
-        Serial0.println("File written successfully!");
-    } else {
-        Serial0.println("Failed to write file!");
-    }
+    // // 写文件
+    // File file = SD_MMC.open("/test.txt", FILE_WRITE);
+    // if (file) {
+    //     file.println("Hello, ESP32-S3 SDMMC 1bit!");
+    //     file.close();
+    //     Serial0.println("File written successfully!");
+    // } else {
+    //     Serial0.println("Failed to write file!");
+    // }
 
-    // 读文件
-    file = SD_MMC.open("/test.txt", FILE_READ);
-    if (file) {
-        Serial0.println("Reading file content:");
-        while (file.available()) {
-            Serial0.write(file.read());
-        }
-        file.close();
-        Serial0.println("\nFile read successfully!");
-    } else {
-        Serial0.println("Failed to read file!");
-    }
+    // // 读文件
+    // file = SD_MMC.open("/test.txt", FILE_READ);
+    // if (file) {
+    //     Serial0.println("Reading file content:");
+    //     while (file.available()) {
+    //         Serial0.write(file.read());
+    //     }
+    //     file.close();
+    //     Serial0.println("\nFile read successfully!");
+    // } else {
+    //     Serial0.println("Failed to read file!");
+    // }
 
-    // 删除文件
-    if (SD_MMC.remove("/test.txt")) {
-        Serial0.println("File deleted successfully!");
-    } else {
-        Serial0.println("Failed to delete file!");
-    }
+    // // 删除文件
+    // if (SD_MMC.remove("/test.txt")) {
+    //     Serial0.println("File deleted successfully!");
+    // } else {
+    //     Serial0.println("Failed to delete file!");
+    // }
+
+    /*init IMU*/
+    // imu.begin(0x6A);
     
 }
 void DEVICES::printBspInfos()

@@ -12,8 +12,7 @@
 class MeowKit
 {
     private:
-        DEVICES* _device;
-        QMI8658A* _imu = nullptr; // IMU sensor
+        DEVICES* _device = nullptr; // Bsp devices
     public:
         void Setup();
         void Loop();
