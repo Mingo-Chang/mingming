@@ -186,6 +186,7 @@ static void disp_init(void)
     _lcd->setBrightness(15);
     _lcd->setRotation(0);
     _lcd->fillScreen(TFT_BLACK);
+
 }
 
 volatile bool disp_flush_enabled = true;

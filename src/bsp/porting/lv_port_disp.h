@@ -19,6 +19,7 @@
 #include "lvgl.h"
 #endif
 #include "display.hpp"
+#include <PCA9557.h>
 /*********************
  *      DEFINES
  *********************/

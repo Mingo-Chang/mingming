@@ -26,9 +26,6 @@ void MeowKit::Setup()
     /* Init device */
     _device->init();
 
-    // 初始化IMU
-    //_device->imu.begin(); 
-
     /* Init lvgl */
     // lv_init();
     // lv_port_disp_init(&_device->Lcd);

@@ -22,7 +22,7 @@ void DEVICES::init()
     button.PWR_ON.read(); // 更新按键状态
     if (button.PWR_ON.held(3000))// 判断按键是否按下并保持 3 秒
     {
-        digitalWrite(HAL_PIN_PWR_HOLD,HIGH); // 执行开机操作
+        digitalWrite(HAL_PIN_PWR_HOLD,LOW); // 执行开机操作
         delay(1000); // 防止重复触发
     }
 
@@ -43,9 +43,9 @@ void DEVICES::init()
     /* Init lcd */
     Lcd.init();
     Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
-    Lcd.setFont(&fonts::efontCN_12);
+    Lcd.setFont(&fonts::efontCN_16);
     Lcd.setCursor(0, 0);
-    Lcd.printf("\n BSP %s :)\n Author: Mingo(ง •_•)ง\n", BSP_VERISON);
+    Lcd.printf("\n BSP %s :)\n Author: Mingo@whitecliff\n", BSP_VERISON);
     Lcd.printf(" Project: %s\n", PROJECT_NAME);
     
     /* Init SD_MMC*/
@@ -81,7 +81,10 @@ void DEVICES::init()
     // }
 
     /*init IMU*/
-    // imu.begin(0x6A);
+    imu.begin(0x6A);
+
+    /* Init audio */
+    //audio.init();
     
 }
 void DEVICES::printBspInfos()
