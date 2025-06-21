@@ -32,13 +32,16 @@ void DEVICES::init()
 
     // /* Init I2C */
     Wire.begin(HAL_PIN_I2C_SDA,HAL_PIN_I2C_SCL);
-    Wire.setClock(400000);
+    Wire.setClock(I2CSPEED); // 设置I2C时钟频率
 
     /* Init PCA9557PW_LCD_CS */
     PCA9557 io(0x19, &Wire); // 0x19 for iFarm4G board
     #define LCD_CS_PIN (0)
     io.pinMode(LCD_CS_PIN, OUTPUT);
-    io.digitalWrite(LCD_CS_PIN, LOW);  // 确保CS引脚正确设置为低电平
+    io.digitalWrite(LCD_CS_PIN, LOW); //lcd使能 
+    #define PA_EN (1)
+    io.pinMode(PA_EN, OUTPUT);
+    io.digitalWrite(PA_EN, HIGH); //扬声器使能
 
     /* Init lcd */
     Lcd.init();
@@ -80,12 +83,13 @@ void DEVICES::init()
     //     Serial0.println("Failed to delete file!");
     // }
 
-    /*init IMU*/
+    /*Init IMU*/
     imu.begin(0x6A);
 
     /* Init audio */
-    //audio.init();
-    
+    audio.init();
+    Lcd.printf(" BSP init done!\n");
+
 }
 void DEVICES::printBspInfos()
 {

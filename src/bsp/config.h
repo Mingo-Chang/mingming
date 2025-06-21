@@ -27,6 +27,14 @@
 /* I2C */
 #define HAL_PIN_I2C_SCL 2
 #define HAL_PIN_I2C_SDA 1
+#define I2CSPEED        400000 // Clock Rate
+
+// I2S, your configuration for the ES8388 board
+#define MCLKPIN             38 // Master Clock
+#define BCLKPIN             14 // Bit Clock
+#define WSPIN               13 // Word select
+#define DOPIN               45 // This is connected to DI on ES8388 (MISO)
+#define DIPIN               -1 // This is connected to DO on ES8388 (MOSI)
 
 /* Common configs */
 #define BSP_VERISON                "v1.0"

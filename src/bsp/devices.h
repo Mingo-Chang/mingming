@@ -14,7 +14,8 @@
 #include "button/button.hpp"
 #include "imu/QMI8658A.h"
 #include "sd/sd.hpp"
-#include "audio/audio.hpp"
+#include "audio/audio_es.h" 
+#include "rtc/pcf8563.h"
 #include <PCA9557.h>
 
 class DEVICES

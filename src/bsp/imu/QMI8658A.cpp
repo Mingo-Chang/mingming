@@ -1,6 +1,6 @@
 #include "QMI8658A.h"
-#include <Wire.h>
 #include <math.h>
+#include <Wire.h>
 
 QMI8658A::QMI8658A() : _addr(QMI8658A_I2C_ADDR) {}
 
