@@ -17,6 +17,7 @@
 #include "audio/audio_es.h" 
 #include "rtc/pcf8563.h"
 #include <PCA9557.h>
+#include <BleMouse.h>
 
 class DEVICES
 {
@@ -30,6 +31,7 @@ public:
     SDMMC_SD     sd;
     PCA9557      io;
     Audio     audio;
+    BleMouse bleMouse;
 
     void init();
     void printBspInfos();

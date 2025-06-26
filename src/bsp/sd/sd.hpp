@@ -3,9 +3,9 @@
  * @author 
  * @brief ESP32-S3 SDMMC 1-bit 3线SD卡驱动
  * @version 0.1
- * @date 2024-06-18
+ * @date 
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 
  * 
  */
 #pragma once

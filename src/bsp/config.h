@@ -19,8 +19,8 @@
 #define HAL_PIN_PWR_ON 11 //high：开机
 
 /* Button */
-#define HAL_A 4
-#define HAL_B 5
+#define HAL_A 5
+#define HAL_B 4
 
 /* SD card */
 

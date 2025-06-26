@@ -182,7 +182,7 @@ void lv_port_disp_init(LGFX* lcd)
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
-    _lcd->init();
+    
     _lcd->setBrightness(15);
     _lcd->setRotation(0);
     _lcd->fillScreen(TFT_BLACK);

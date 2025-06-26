@@ -3,7 +3,7 @@
   "C_Cpp_Runner.cppCompilerPath": "C:/Users/zmm04/.platformio/packages/toolchain-xtensa-esp32s3/bin/xtensa-esp32s3-elf-g++.exe",
   "C_Cpp_Runner.debuggerPath": "C:/Users/zmm04/.platformio/packages/toolchain-xtensa-esp32s3/bin/xtensa-esp32s3-elf-gdb.exe",
   "C_Cpp_Runner.cStandard": "gnu99",
-  "C_Cpp_Runner.cppStandard": "gnu++11",
+  "C_Cpp_Runner.cppStandard": "gnu++17",
   "C_Cpp_Runner.msvcBatchPath": "C:/Program Files/Microsoft Visual Studio/VR_NR/Community/VC/Auxiliary/Build/vcvarsall.bat",
   "C_Cpp_Runner.useMsvc": false,
   "C_Cpp_Runner.warnings": [
@@ -308,7 +308,8 @@
     "tuple": "cpp",
     "type_traits": "cpp",
     "utility": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "chrono": "cpp"
   },
   "cmake.ignoreCMakeListsMissing": true
 }

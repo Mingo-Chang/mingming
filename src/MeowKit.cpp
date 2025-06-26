@@ -1,11 +1,11 @@
 /**
- * @file rachel.cpp
- * @author Forairaaaaa
+ * @file 
+ * @author 
  * @brief
- * @version 0.1
- * @date 2023-11-04
+ * @version 
+ * @date 
  *
- * @copyright Copyright (c) 2023
+ * @copyright 
  *
  */
 #include "MeowKit.h"
@@ -27,30 +27,21 @@ void MeowKit::Setup()
     _device->init();
 
     /* Init lvgl */
-    // lv_init();
-    // lv_port_disp_init(&_device->Lcd);
-    // lv_port_indev_init(&_device->ctp);
+    lv_init();
+    lv_port_disp_init(&_device->Lcd);
+    lv_port_indev_init(&_device->ctp);
 
     /* Init ui */
-    // ui_init();
+    ui_init();
 }
 
 void MeowKit::Loop() 
 { 
-    // lv_timer_handler();delay(5); 
-
-    // QMI8658A_Data _data;
     
-    // if (_device->imu.readRawData(&_data)) {
-        
-    //     _device->imu.readAngle(&_data);
-    //     printf("IMU Angle:%f, %f, %f\n", 
-    //            _data.AngleX, _data.AngleY, _data.AngleZ);
-    // } else {
-    //     printf("Failed to read IMU data\n");
-    // }
+    lv_timer_handler();  // 处理 LVGL
+    delay(5);  // 延时，防止 CPU 占用过高
+    //GetMooncake().update();  // Mooncake 状态调度
 
-    // delay(10); 
 }
 
 void MeowKit::Destroy()

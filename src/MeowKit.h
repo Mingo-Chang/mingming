@@ -7,6 +7,10 @@
 #include "bsp/porting/lv_port_disp.h"
 #include "bsp/porting/lv_port_indev.h"
 #include "bsp/imu/QMI8658A.h"
+#include <cstdio>
+#include <mooncake.h>
+
+using namespace mooncake;
 
 
 class MeowKit
