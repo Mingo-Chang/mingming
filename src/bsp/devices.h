@@ -18,6 +18,10 @@
 #include "rtc/pcf8563.h"
 #include <PCA9557.h>
 #include <BleMouse.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+#include <IRrecv.h>
+#include <IRutils.h>
 
 class DEVICES
 {
@@ -32,7 +36,9 @@ public:
     PCA9557      io;
     Audio     audio;
     BleMouse bleMouse;
+    PCF8563     pcf;
 
     void init();
     void printBspInfos();
+    int getBatteryPercent();
 };

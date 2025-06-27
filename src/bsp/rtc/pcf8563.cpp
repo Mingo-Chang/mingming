@@ -1,7 +1,6 @@
 #include "PCF8563.h"
 #include <Wire.h>
 
-PCF8563::PCF8563(void* wire, uint8_t addr) : _wire(wire), _addr(addr) {}
 
 bool PCF8563::begin() {
     TwoWire* wire = static_cast<TwoWire*>(_wire);

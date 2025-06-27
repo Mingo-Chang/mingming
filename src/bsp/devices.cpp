@@ -10,7 +10,20 @@
  */
 #include "devices.h"
 
-
+IRsend irsend(HAL_PIN_IR_TX);
+IRrecv irrecv(HAL_PIN_IR_RX);
+decode_results results;
+uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+                        600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+                        600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+                        650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+                        650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+                        650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+                        650, 1650, 650, 1650, 650, 1650, 600};
+// Example Samsung A/C state captured from IRrecvDumpV2.ino
+uint8_t samsungState[kSamsungAcStateLength] = {
+    0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+    0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
 
 void DEVICES::init()
 {
@@ -118,11 +131,95 @@ void DEVICES::init()
     // }
     // delay(20); // 50Hz
     // }
+    // 记录实时数据显示的起始Y坐标
+    int info_y = Lcd.getCursorY();
+    pcf.begin();
+    RTC_Time t = {0, 24, 4, 26, 5, 6, 2025}; // 2025-1-1 12:00:00
+    pcf.setTime(t);
     
+    irsend.begin();
+    //irrecv.enableIRIn();
+    delay(1000); // 等待红外发送器稳定
+    while(1)
+    {
+        // RTC_Time now;
+        // button.A.read(); // 更新按键状态
+        // button.B.read(); // 更新按键状态
+
+        // // 获取电池电量和RTC时间
+        // int percent = getBatteryPercent();
+        // pcf.getTime(now);
+        
+        // // 显示电池电量和RTC时间
+        // Lcd.setCursor(0, info_y);
+        // Lcd.printf(" Battery: %d%%   \n", percent);
+        // Lcd.printf(" RTC: %04d-%02d-%02d %02d:%02d:%02d   \n",
+        //     now.year, now.month, now.day, now.hour, now.min, now.sec);
+
+        // delay(500); // 刷新间隔，防止刷屏太快
+
+        if(button.A.pressed()) // 按键A被按下
+        {
+            Serial0.println("NEC");
+            irsend.sendNEC(0x00FFE01FUL);
+            delay(2000);
+            Serial0.println("Sony");
+            irsend.sendSony(0xa90, 12, 2);  // 12 bits & 2 repeats
+            delay(2000);
+            Serial0.println("a rawData capture from IRrecvDumpV2");
+            irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
+            delay(2000);
+            Serial0.println("a Samsung A/C state from IRrecvDumpV2");
+            irsend.sendSamsungAC(samsungState);
+            delay(2000);
+        }
+
+        // if (irrecv.decode(&results)) {
+        //     // 直接用 Serial.printf 打印 uint64_t
+        //     Serial0.printf("0x%llX\n", results.value);
+        //     irrecv.resume();  // Receive the next value
+        // }
+        // delay(100);          
+    }
 }
 
 void DEVICES::printBspInfos()
 {
     printf(" BSP %s ;)\n Author: Mingo(ง •_•)ง \n", BSP_VERISON);
     printf(" Project: %s\n", PROJECT_NAME);
+}
+
+int DEVICES::getBatteryPercent()
+{
+    const int adcPin = 6; // IO6
+    const float R7 = 100000.0f; // 100k
+    const float R8 = 100000.0f; // 100k
+    const float adcMax = 4095.0f;
+    const float vRef = 3.3f; // ESP32 ADC参考电压
+
+    int raw = analogRead(adcPin);
+    float vDiv = (raw / adcMax) * vRef;
+    float vBat = vDiv * (R7 + R8) / R8;
+
+    float percent = 0;
+    if (vBat >= 4.20f)
+        percent = 100;
+    else if (vBat >= 4.10f)
+        percent = 90 + (vBat - 4.10f) * 100;
+    else if (vBat >= 3.95f)
+        percent = 80 + (vBat - 3.95f) * 66.7f;
+    else if (vBat >= 3.80f)
+        percent = 60 + (vBat - 3.80f) * 133.3f;
+    else if (vBat >= 3.65f)
+        percent = 40 + (vBat - 3.65f) * 133.3f;
+    else if (vBat >= 3.50f)
+        percent = 20 + (vBat - 3.50f) * 133.3f;
+    else if (vBat >= 3.30f)
+        percent = 5 + (vBat - 3.30f) * 75.0f;
+    else
+        percent = 0;
+
+    if (percent > 100.0f) percent = 100.0f;
+    if (percent < 0.0f) percent = 0.0f;
+    return (int)percent;
 }
