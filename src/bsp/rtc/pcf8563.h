@@ -17,8 +17,8 @@ struct RTC_Time {
 
 class PCF8563 {
 public:
-    PCF8563(TwoWire* wire = &Wire, uint8_t addr = 0x51)
-            : _wire(wire), _addr(addr) {};
+    PCF8563(uint8_t addr = PCF8563_ADDR,TwoWire* wire = &Wire)
+        : _addr(addr),_wire(wire) {}
 
     bool begin();
     bool getTime(RTC_Time &time);

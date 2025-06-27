@@ -10,45 +10,39 @@
  */
 #include "devices.h"
 
-IRsend irsend(HAL_PIN_IR_TX);
-IRrecv irrecv(HAL_PIN_IR_RX);
-decode_results results;
-uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
-                        600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
-                        600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
-                        650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
-                        650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
-                        650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
-                        650, 1650, 650, 1650, 650, 1650, 600};
-// Example Samsung A/C state captured from IRrecvDumpV2.ino
-uint8_t samsungState[kSamsungAcStateLength] = {
-    0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
-    0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+// IRsend irsend(HAL_PIN_IR_TX);
+// IRrecv irrecv(HAL_PIN_IR_RX);
+// decode_results results;
+// uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+//                         600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+//                         600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+//                         650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+//                         650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+//                         650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+//                         650, 1650, 650, 1650, 650, 1650, 600};
+// // Example Samsung A/C state captured from IRrecvDumpV2.ino
+// uint8_t samsungState[kSamsungAcStateLength] = {
+//     0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+//     0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
 
 void DEVICES::init()
 {
     Serial0.begin(115200);
     Serial0.println("BSP init...");
-    
+
     /* Init POWER */
     button.PWR_ON.begin();
-    button.PWR_ON.read(); // 更新按键状态
-    if (button.PWR_ON.held(3000))// 判断按键是否按下并保持 3 秒
-    {
-        digitalWrite(HAL_PIN_PWR_HOLD,LOW); // 执行开机操作
-        delay(1000); // 防止重复触发
+    button.PWR_ON.read();
+    if (button.PWR_ON.held(3000)) {
+        digitalWrite(HAL_PIN_PWR_HOLD, HIGH);
+        delay(1000);
     }
 
-    /* Init button A and B*/
-    button.A.begin();
-    button.B.begin();
+    /* Init I2C */
+    Wire.begin(HAL_PIN_I2C_SDA, HAL_PIN_I2C_SCL);
+    Wire.setClock(I2CSPEED);
 
-    // /* Init I2C */
-    Wire.begin(HAL_PIN_I2C_SDA,HAL_PIN_I2C_SCL);
-    Wire.setClock(I2CSPEED); // 设置I2C时钟频率
-
-    /* Init PCA9557PW_LCD_CS */
-    PCA9557 io(0x19, &Wire); // 0x19 for iFarm4G board
+    /* Init PCA9557 */
     #define LCD_CS_PIN (0)
     io.pinMode(LCD_CS_PIN, OUTPUT);
     io.digitalWrite(LCD_CS_PIN, LOW); //lcd使能 
@@ -56,13 +50,65 @@ void DEVICES::init()
     io.pinMode(PA_EN, OUTPUT);
     io.digitalWrite(PA_EN, HIGH); //扬声器使能
 
-    /* Init lcd */
+    /* I2C设备检测 */
+    struct {
+        const char* name;
+        uint8_t addr;
+        uint8_t* result;
+    } i2c_devs[] = {
+        {"PCA9557", 0x19, nullptr},
+        {"RTC", PCF8563_ADDR, nullptr},
+        {"IMU", QMI8658A_I2C_ADDR, nullptr},
+        {"CTP", CTP_DEV_ADDR, nullptr},
+        {"SPEAKER", ES8311ADDR, nullptr},
+        {"MIC", 0x41, nullptr}
+    };
+    uint8_t i2c_results[sizeof(i2c_devs)/sizeof(i2c_devs[0])];
+    for (size_t i = 0; i < sizeof(i2c_devs)/sizeof(i2c_devs[0]); ++i) {
+        Wire.beginTransmission(i2c_devs[i].addr);
+        i2c_results[i] = Wire.endTransmission();
+        i2c_devs[i].result = &i2c_results[i];
+    }
+
+    /* Init lcd bootloader */
     Lcd.init();
     Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
     Lcd.setFont(&fonts::efontCN_16);
     Lcd.setCursor(0, 0);
-    Lcd.printf("\n BSP %s :)\n Author: Mingo@whitecliff\n", BSP_VERISON);
+    Lcd.printf(" \n BSP %s :)\n Author: Mingo@whitecliff\n", BSP_VERISON);
     Lcd.printf(" Project: %s\n", PROJECT_NAME);
+
+    // 显示I2C检测结果
+    for (size_t i = 0; i < sizeof(i2c_devs)/sizeof(i2c_devs[0]); ++i) {
+        Lcd.printf(" %s: %s\n", i2c_devs[i].name, (*i2c_devs[i].result == 0) ? "OK" : "FAIL");
+    }
+
+    /* Init button A and B */
+    button.A.begin();
+    button.B.begin();
+
+    // 检测A键
+    Lcd.printf(" 请按下A键...");
+    while (1) {
+        button.A.read();
+        if (button.A.pressed()) {
+            Lcd.printf(" A键 OK\n");
+            break;
+        }
+        delay(10);
+    }
+
+    // 检测B键
+    Lcd.printf(" 请按下B键...");
+    while (1) {
+        button.B.read();
+        if (button.B.pressed()) {
+            Lcd.printf(" B键 OK\n");
+            break;
+        }
+        delay(10);
+    }
+
     Lcd.printf(" BSP init done!\n");
     delay(2000); // 等待显示稳定
     
@@ -132,16 +178,16 @@ void DEVICES::init()
     // delay(20); // 50Hz
     // }
     // 记录实时数据显示的起始Y坐标
-    int info_y = Lcd.getCursorY();
-    pcf.begin();
-    RTC_Time t = {0, 24, 4, 26, 5, 6, 2025}; // 2025-1-1 12:00:00
-    pcf.setTime(t);
+    // int info_y = Lcd.getCursorY();
+    // pcf.begin();
+    // RTC_Time t = {0, 24, 4, 26, 5, 6, 2025}; // 2025-1-1 12:00:00
+    // pcf.setTime(t);
     
-    irsend.begin();
-    //irrecv.enableIRIn();
-    delay(1000); // 等待红外发送器稳定
-    while(1)
-    {
+    // irsend.begin();
+    // //irrecv.enableIRIn();
+    // delay(1000); // 等待红外发送器稳定
+    // while(1)
+    // {
         // RTC_Time now;
         // button.A.read(); // 更新按键状态
         // button.B.read(); // 更新按键状态
@@ -158,21 +204,21 @@ void DEVICES::init()
 
         // delay(500); // 刷新间隔，防止刷屏太快
 
-        if(button.A.pressed()) // 按键A被按下
-        {
-            Serial0.println("NEC");
-            irsend.sendNEC(0x00FFE01FUL);
-            delay(2000);
-            Serial0.println("Sony");
-            irsend.sendSony(0xa90, 12, 2);  // 12 bits & 2 repeats
-            delay(2000);
-            Serial0.println("a rawData capture from IRrecvDumpV2");
-            irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
-            delay(2000);
-            Serial0.println("a Samsung A/C state from IRrecvDumpV2");
-            irsend.sendSamsungAC(samsungState);
-            delay(2000);
-        }
+        // if(button.A.pressed()) // 按键A被按下
+        // {
+        //     Serial0.println("NEC");
+        //     irsend.sendNEC(0x00FFE01FUL);
+        //     delay(2000);
+        //     Serial0.println("Sony");
+        //     irsend.sendSony(0xa90, 12, 2);  // 12 bits & 2 repeats
+        //     delay(2000);
+        //     Serial0.println("a rawData capture from IRrecvDumpV2");
+        //     irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
+        //     delay(2000);
+        //     Serial0.println("a Samsung A/C state from IRrecvDumpV2");
+        //     irsend.sendSamsungAC(samsungState);
+        //     delay(2000);
+        // }
 
         // if (irrecv.decode(&results)) {
         //     // 直接用 Serial.printf 打印 uint64_t
@@ -180,18 +226,12 @@ void DEVICES::init()
         //     irrecv.resume();  // Receive the next value
         // }
         // delay(100);          
-    }
-}
-
-void DEVICES::printBspInfos()
-{
-    printf(" BSP %s ;)\n Author: Mingo(ง •_•)ง \n", BSP_VERISON);
-    printf(" Project: %s\n", PROJECT_NAME);
+    // }
 }
 
 int DEVICES::getBatteryPercent()
 {
-    const int adcPin = 6; // IO6
+    const int adcPin = 9; // IO9
     const float R7 = 100000.0f; // 100k
     const float R8 = 100000.0f; // 100k
     const float adcMax = 4095.0f;

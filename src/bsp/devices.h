@@ -38,7 +38,12 @@ public:
     BleMouse bleMouse;
     PCF8563     pcf;
 
+    DEVICES() : io(0x19, &Wire), pcf(PCF8563_ADDR,&Wire) {}
+    ~DEVICES() {}   
+    /**
+     * @brief 初始化设备
+     * 
+     */
     void init();
-    void printBspInfos();
     int getBatteryPercent();
 };
