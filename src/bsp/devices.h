@@ -16,6 +16,7 @@
 #include "sd/sd.hpp"
 #include "audio/audio_es.h" 
 #include "rtc/pcf8563.h"
+#include "config.h"
 #include <PCA9557.h>
 #include <BleMouse.h>
 #include <IRremoteESP8266.h>
@@ -29,7 +30,7 @@ private:
 
 public:
     CTP         ctp;
-    LGFX        Lcd;
+    Meow_LGFX   Lcd;
     Button   button;
     QMI8658A    imu;
     SDMMC_SD     sd;

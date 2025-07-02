@@ -9,14 +9,17 @@
 #include "bsp/imu/QMI8658A.h"
 #include <cstdio>
 #include <mooncake.h>
+#include "app/launcher/launcher.h"
 
 using namespace mooncake;
-
+using namespace MOONCAKE::APPS;
 
 class MeowKit
 {
     private:
         DEVICES* _device = nullptr; // Bsp devices
+        std::unique_ptr<Launcher> _launcher = nullptr;
+
     public:
         void Setup();
         void Loop();

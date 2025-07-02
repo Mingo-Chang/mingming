@@ -48,7 +48,7 @@
  * GLOBAL PROTOTYPES
  **********************/
 /* Initialize low level display driver */
-void lv_port_disp_init(LGFX* lcd);
+void lv_port_disp_init(Meow_LGFX* lcd);
 
 /* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
  */

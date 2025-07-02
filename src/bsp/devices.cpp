@@ -10,21 +10,6 @@
  */
 #include "devices.h"
 
-// IRsend irsend(HAL_PIN_IR_TX);
-// IRrecv irrecv(HAL_PIN_IR_RX);
-// decode_results results;
-// uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
-//                         600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
-//                         600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
-//                         650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
-//                         650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
-//                         650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
-//                         650, 1650, 650, 1650, 650, 1650, 600};
-// // Example Samsung A/C state captured from IRrecvDumpV2.ino
-// uint8_t samsungState[kSamsungAcStateLength] = {
-//     0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
-//     0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
-
 void DEVICES::init()
 {
     Serial0.begin(115200);
@@ -41,6 +26,7 @@ void DEVICES::init()
     /* Init I2C */
     Wire.begin(HAL_PIN_I2C_SDA, HAL_PIN_I2C_SCL);
     Wire.setClock(I2CSPEED);
+    delay(50); // 增加延时，确保I2C设备上电稳定
 
     /* Init PCA9557 */
     #define LCD_CS_PIN (0)
@@ -80,9 +66,17 @@ void DEVICES::init()
 
     // 显示I2C检测结果
     for (size_t i = 0; i < sizeof(i2c_devs)/sizeof(i2c_devs[0]); ++i) {
-        Lcd.printf(" %s: %s\n", i2c_devs[i].name, (*i2c_devs[i].result == 0) ? "OK" : "FAIL");
+        if (*i2c_devs[i].result == 0) {
+            Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
+            Lcd.printf(" %s: OK\n", i2c_devs[i].name);
+        } else {
+            Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+            Lcd.printf(" %s: FAIL\n", i2c_devs[i].name);
+        }
     }
-
+    // 检查完后恢复默认颜色
+    Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
+    Lcd.printf(" 电池电量: %d%%\n", getBatteryPercent());
     /* Init button A and B */
     button.A.begin();
     button.B.begin();
@@ -231,13 +225,13 @@ void DEVICES::init()
 
 int DEVICES::getBatteryPercent()
 {
-    const int adcPin = 9; // IO9
+    
     const float R7 = 100000.0f; // 100k
     const float R8 = 100000.0f; // 100k
     const float adcMax = 4095.0f;
     const float vRef = 3.3f; // ESP32 ADC参考电压
 
-    int raw = analogRead(adcPin);
+    int raw = analogRead(HAL_adcPin);
     float vDiv = (raw / adcMax) * vRef;
     float vBat = vDiv * (R7 + R8) / R8;
 

@@ -40,7 +40,7 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
  *  STATIC VARIABLES
  **********************/
 
-static LGFX* _lcd;
+static Meow_LGFX* _lcd;
 
 /**********************
  *      MACROS
@@ -50,7 +50,7 @@ static LGFX* _lcd;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_port_disp_init(LGFX* lcd)
+void lv_port_disp_init(Meow_LGFX* lcd)
 {
     /*-------------------------
      * Initialize your display

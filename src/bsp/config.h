@@ -18,11 +18,16 @@
 #define HAL_PIN_PWR_HOLD 10
 #define HAL_PIN_PWR_ON 11 //high：开机
 
+#define HAL_adcPin 6
+
 /* Button */
 #define HAL_A 5
 #define HAL_B 4
 
-/* SD card */
+/* SD card 3线SDMMC 1-bit模式 */
+#define SDMMC_SD_PIN_CLK   47
+#define SDMMC_SD_PIN_CMD   48
+#define SDMMC_SD_PIN_D0    21
 
 /* I2C */
 #define HAL_PIN_I2C_SCL 2

@@ -2,7 +2,7 @@
 #include <LovyanGFX.hpp>
 #include "../config.h"
 /// 独自の設定を行うクラスを、LGFX_Deviceから派生して作成します。
-class LGFX : public lgfx::LGFX_Device
+class Meow_LGFX : public lgfx::LGFX_Device
 {
     lgfx::Panel_ST7789      _panel_instance;
     lgfx::Bus_SPI        _bus_instance;   // SPIバスのインスタンス
@@ -11,7 +11,7 @@ class LGFX : public lgfx::LGFX_Device
 
 public:
 
-  LGFX(void)
+  Meow_LGFX(void)
   {
     { // バス制御の設定を行います。
       auto cfg = _bus_instance.config();    // バス設定用の構造体を取得します。

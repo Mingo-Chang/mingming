@@ -12,11 +12,7 @@
 #include <Arduino.h>
 #include <FS.h>
 #include <SD_MMC.h>
-
-// 3线SDMMC 1-bit模式引脚定义
-#define SDMMC_SD_PIN_CLK   47
-#define SDMMC_SD_PIN_CMD   48
-#define SDMMC_SD_PIN_D0    21
+#include "../config.h"
 
 class SDMMC_SD {
 private:
