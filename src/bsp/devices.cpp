@@ -26,7 +26,7 @@ void DEVICES::init()
     /* Init I2C */
     Wire.begin(HAL_PIN_I2C_SDA, HAL_PIN_I2C_SCL);
     Wire.setClock(I2CSPEED);
-    delay(50); // 增加延时，确保I2C设备上电稳定
+    delay(100); // 增加延时，确保I2C设备上电稳定
 
     /* Init PCA9557 */
     #define LCD_CS_PIN (0)
@@ -49,12 +49,8 @@ void DEVICES::init()
         {"SPEAKER", ES8311ADDR, nullptr},
         {"MIC", 0x41, nullptr}
     };
-    uint8_t i2c_results[sizeof(i2c_devs)/sizeof(i2c_devs[0])];
-    for (size_t i = 0; i < sizeof(i2c_devs)/sizeof(i2c_devs[0]); ++i) {
-        Wire.beginTransmission(i2c_devs[i].addr);
-        i2c_results[i] = Wire.endTransmission();
-        i2c_devs[i].result = &i2c_results[i];
-    }
+    constexpr size_t i2c_dev_count = sizeof(i2c_devs) / sizeof(i2c_devs[0]);
+    uint8_t i2c_results[i2c_dev_count];
 
     /* Init lcd bootloader */
     Lcd.init();
@@ -63,6 +59,19 @@ void DEVICES::init()
     Lcd.setCursor(0, 0);
     Lcd.printf(" \n BSP %s :)\n Author: Mingo@whitecliff\n", BSP_VERISON);
     Lcd.printf(" Project: %s\n", PROJECT_NAME);
+
+    // I2C设备检测（带重试）
+    for (size_t i = 0; i < i2c_dev_count; ++i) {
+        uint8_t result = 1;
+        for (int retry = 0; retry < 3; ++retry) {
+            Wire.beginTransmission(i2c_devs[i].addr);
+            result = Wire.endTransmission();
+            if (result == 0) break; // 检测到设备则退出重试
+            delay(10);
+        }
+        i2c_results[i] = result;
+        i2c_devs[i].result = &i2c_results[i];
+    }
 
     // 显示I2C检测结果
     for (size_t i = 0; i < sizeof(i2c_devs)/sizeof(i2c_devs[0]); ++i) {
@@ -77,9 +86,28 @@ void DEVICES::init()
     // 检查完后恢复默认颜色
     Lcd.setTextColor(TFT_GREEN, TFT_BLACK);
     Lcd.printf(" 电池电量: %d%%\n", getBatteryPercent());
+    pcf.begin();
+    RTC_Time t = {0, 30, 6, 3, 3, 7, 2025}; // 2025-1-1 12:00:00
+    pcf.setTime(t);
+    // 记录当前光标位置，便于刷新
+    int info_y = Lcd.getCursorY();
+
+    // 5秒内循环刷新时间显示
+    unsigned long start = millis();
+    while (millis() - start < 5000) {
+        RTC_Time now;
+        pcf.getTime(now);
+        Lcd.setCursor(0, info_y);
+        Lcd.printf(" Time: %04d-%02d-%02d %02d:%02d:%02d   \n",
+            now.year, now.month, now.day, now.hour, now.min, now.sec);
+        delay(500); // 每0.5秒刷新一次
+    }
     /* Init button A and B */
     button.A.begin();
     button.B.begin();
+    /* IR_T Close */ 
+    pinMode(HAL_PIN_IR_TX, OUTPUT);
+    digitalWrite(HAL_PIN_IR_TX, LOW);
 
     // 检测A键
     Lcd.printf(" 请按下A键...");
@@ -174,7 +202,7 @@ void DEVICES::init()
     // 记录实时数据显示的起始Y坐标
     // int info_y = Lcd.getCursorY();
     // pcf.begin();
-    // RTC_Time t = {0, 24, 4, 26, 5, 6, 2025}; // 2025-1-1 12:00:00
+    // RTC_Time t = {0, 30, 6, 3, 3, 7, 2025}; // 2025-1-1 12:00:00
     // pcf.setTime(t);
     
     // irsend.begin();
@@ -182,7 +210,7 @@ void DEVICES::init()
     // delay(1000); // 等待红外发送器稳定
     // while(1)
     // {
-        // RTC_Time now;
+    //     RTC_Time now;
         // button.A.read(); // 更新按键状态
         // button.B.read(); // 更新按键状态
 
@@ -193,7 +221,7 @@ void DEVICES::init()
         // // 显示电池电量和RTC时间
         // Lcd.setCursor(0, info_y);
         // Lcd.printf(" Battery: %d%%   \n", percent);
-        // Lcd.printf(" RTC: %04d-%02d-%02d %02d:%02d:%02d   \n",
+        // Lcd.printf(" Time: %04d-%02d-%02d %02d:%02d:%02d   \n",
         //     now.year, now.month, now.day, now.hour, now.min, now.sec);
 
         // delay(500); // 刷新间隔，防止刷屏太快
@@ -219,7 +247,7 @@ void DEVICES::init()
         //     Serial0.printf("0x%llX\n", results.value);
         //     irrecv.resume();  // Receive the next value
         // }
-        // delay(100);          
+    //     delay(500);          
     // }
 }
 

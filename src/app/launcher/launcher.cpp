@@ -11,37 +11,31 @@ namespace MOONCAKE
     {
         void Launcher::updateAPPManager()
         {
-            if (selected_app_index >= 0) 
+            if (selected_app_index >= 0)
             {
-                //std::cout<<"App Index open:"<<selected_app_index<<std::endl;
-                //_mooncake->closeApp(0);
-                // 打开app
-                _mooncake->openApp(selected_app_index);
-                _mooncake->update();
-                
-                //运行app
-                if (_mooncake->getAppCurrentState(selected_app_index) == AppAbility::State_t::StateRunning)
+                auto state = _mooncake->getAppCurrentState(selected_app_index);
+
+                if (state == AppAbility::State_t::StateGoOpen)
                 {
-                    while (1)
+                    _mooncake->openApp(selected_app_index);
+                    _mooncake->update();
+                }
+                else if (state == AppAbility::State_t::StateRunning)
+                {
+                    _mooncake->update();
+                    // 检查按键退出
+                    if (_device->button.B.pressed())
                     {
-                        _mooncake->update();
-                        if (_device->button.B.pressed())
-                        {
-                            
-                            break;
-                        }
+                        _mooncake->closeApp(selected_app_index);
                     }
                 }
-
-                //关闭app
-                if (_mooncake->getAppCurrentState(selected_app_index) == AppAbility::State_t::StateGoClose) 
+                else if (state == AppAbility::State_t::StateGoClose)
                 {
-                    
                     _mooncake->update();
-                    
+                    selected_app_index = -1;
+                    // 可选：恢复 launcher UI
+                    // ui_init();
                 }
-                selected_app_index = -1;
-                //_lvglWrapp->enable();
             }
         }
 

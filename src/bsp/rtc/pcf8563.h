@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <Wire.h>  // 补充此行
+#include <Wire.h>
 
 // PCF8563 I2C地址
 #define PCF8563_ADDR 0x51
@@ -17,15 +17,15 @@ struct RTC_Time {
 
 class PCF8563 {
 public:
-    PCF8563(uint8_t addr = PCF8563_ADDR,TwoWire* wire = &Wire)
-        : _addr(addr),_wire(wire) {}
+    PCF8563(TwoWire* wire = &Wire, uint8_t addr = PCF8563_ADDR)
+        : _wire(wire), _addr(addr) {}
 
     bool begin();
     bool getTime(RTC_Time &time);
     bool setTime(const RTC_Time &time);
 
 private:
-    void* _wire;    // 实际使用时需强转为TwoWire*
+    TwoWire* _wire;
     uint8_t _addr;
 
     uint8_t bcd2dec(uint8_t val);
