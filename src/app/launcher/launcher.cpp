@@ -3,7 +3,7 @@
 #include "bsp/porting/lv_port_disp.h"
 #include "bsp/porting/lv_port_indev.h"
 #include "ui/src/ui.h"
-#include "../app.h"
+#include "app/app.h"
 
 namespace MOONCAKE
 {
@@ -24,11 +24,10 @@ namespace MOONCAKE
                 {
                     while (1)
                     {
-                        
                         _mooncake->update();
                         if (_device->button.B.pressed())
                         {
-                            _mooncake->closeApp(selected_app_index); // 正确关闭
+                            
                             break;
                         }
                     }
@@ -37,7 +36,7 @@ namespace MOONCAKE
                 //关闭app
                 if (_mooncake->getAppCurrentState(selected_app_index) == AppAbility::State_t::StateGoClose) 
                 {
-                    //_mooncake->closeApp(selected_app_index);
+                    
                     _mooncake->update();
                     
                 }
@@ -86,17 +85,17 @@ namespace MOONCAKE
 
         void Launcher::onCreate()
         {
-            
-            /* Init lvgl */
-            lv_init();
-            lv_port_disp_init(&_device->Lcd);
-            lv_port_indev_init(&_device->ctp);
+            //_device->init();
+            // /* Init lvgl */
+            // lv_init();
+            // lv_port_disp_init(&_device->Lcd);
+            // lv_port_indev_init(&_device->ctp);
 
-            /* Init ui */
-            ui_init();
+            // /* Init ui */
+            // ui_init();
 
             _mooncake = std::make_unique<mooncake::Mooncake>();
-            MeowKit_app_install_callback(_mooncake.get());
+            MeowKit_app_install_callback(_mooncake.get(), _device);
         }
           
         void Launcher::onloop()

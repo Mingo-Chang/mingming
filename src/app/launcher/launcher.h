@@ -66,7 +66,7 @@ namespace MOONCAKE
             DEVICES *_device = nullptr;
 
         public:
-             inline Launcher(DEVICES* device) {  _device = device; }
+             Launcher(DEVICES* device) : _device(device) {}
              void onCreate();
              void onloop();
              void onDestroy();

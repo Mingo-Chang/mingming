@@ -26,17 +26,16 @@ void MeowKit::Setup()
     /* Init device */
     _device->init();
 
+    /* Init lvgl */
+    lv_init();
+    lv_port_disp_init(&_device->Lcd);
+    lv_port_indev_init(&_device->ctp);
+
+    /* Init ui */
+    ui_init();
+
     _launcher = std::make_unique<Launcher>(_device);
     _launcher->onCreate();
-
-    // /* Init lvgl */
-    // lv_init();
-    // lv_port_disp_init(&_device->Lcd);
-    // lv_port_indev_init(&_device->ctp);
-
-    // /* Init ui */
-    // ui_init();
-
     
 }
 

@@ -20,12 +20,13 @@ namespace MOONCAKE::APPS
      */
     class AppTemplate : public AppAbility {
     public:
-        AppTemplate();
+        AppTemplate(DEVICES* device); // 新增构造参数
         void onOpen() override;
         void onRunning() override;
         void onClose() override;
     private:
+        DEVICES* _device = nullptr; // 保存设备指针
         DigitalRainAnimation<Meow_LGFX> matrix_effect;
-        Meow_LGFX tft;
+        // 不再需要 Meow_LGFX tft;，直接用 _device->Lcd
     };
 }
