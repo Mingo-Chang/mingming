@@ -20,7 +20,7 @@ namespace MOONCAKE::APPS
 
     void AppTemplate::onOpen()
     {
-        _device->Lcd.init();
+        
         _device->Lcd.fillScreen(TFT_BLACK);
         matrix_effect.init(&_device->Lcd);
         matrix_effect.setup(
@@ -39,7 +39,7 @@ namespace MOONCAKE::APPS
     void AppTemplate::onClose()
     {
         // 重置动画对象，释放其内部资源
-        matrix_effect = DigitalRainAnimation<Meow_LGFX>();
+        //matrix_effect = DigitalRainAnimation<Meow_LGFX>();
 
         // 清空屏幕，防止残影
         if (_device && _device->Lcd.width() > 0 && _device->Lcd.height() > 0) {

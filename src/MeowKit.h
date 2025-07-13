@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <mooncake.h>
 #include "app/launcher/launcher.h"
+#include <memory>
 
 using namespace mooncake;
 using namespace MOONCAKE::APPS;

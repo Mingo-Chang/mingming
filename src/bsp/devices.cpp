@@ -10,6 +10,23 @@
  */
 #include "devices.h"
 
+IRrecv irrecv(HAL_PIN_IR_RX);
+IRsend irsend(HAL_PIN_IR_TX);
+
+decode_results results;
+// Example of data captured by IRrecvDumpV2.ino
+uint16_t rawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+                        600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+                        600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+                        650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+                        650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+                        650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+                        650, 1650, 650, 1650, 650, 1650, 600};
+// Example Samsung A/C state captured from IRrecvDumpV2.ino
+uint8_t samsungState[kSamsungAcStateLength] = {
+    0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+    0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+
 void DEVICES::init()
 {
     Serial0.begin(115200);
@@ -18,6 +35,7 @@ void DEVICES::init()
     /* Init POWER */
     button.PWR_ON.begin();
     button.PWR_ON.read();
+    pinMode(HAL_PIN_PWR_HOLD,OUTPUT);
     if (button.PWR_ON.held(3000)) {
         digitalWrite(HAL_PIN_PWR_HOLD, HIGH);
         delay(1000);
@@ -206,47 +224,34 @@ void DEVICES::init()
     // pcf.setTime(t);
     
     // irsend.begin();
-    // //irrecv.enableIRIn();
+    // irrecv.enableIRIn();
     // delay(1000); // 等待红外发送器稳定
     // while(1)
     // {
-    //     RTC_Time now;
-        // button.A.read(); // 更新按键状态
-        // button.B.read(); // 更新按键状态
+    //     button.A.read(); // 更新按键状态
+    //     button.B.read(); // 更新按键状态
 
-        // // 获取电池电量和RTC时间
-        // int percent = getBatteryPercent();
-        // pcf.getTime(now);
-        
-        // // 显示电池电量和RTC时间
-        // Lcd.setCursor(0, info_y);
-        // Lcd.printf(" Battery: %d%%   \n", percent);
-        // Lcd.printf(" Time: %04d-%02d-%02d %02d:%02d:%02d   \n",
-        //     now.year, now.month, now.day, now.hour, now.min, now.sec);
+    //     if(button.A.pressed()) // 按键A被按下
+    //     {
+    //         Serial0.println("NEC");
+    //         irsend.sendNEC(0x00FFE01FUL);
+    //         delay(2000);
+    //         Serial0.println("Sony");
+    //         irsend.sendSony(0xa90, 12, 2);  // 12 bits & 2 repeats
+    //         delay(2000);
+    //         Serial0.println("a rawData capture from IRrecvDumpV2");
+    //         irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
+    //         delay(2000);
+    //         Serial0.println("a Samsung A/C state from IRrecvDumpV2");
+    //         irsend.sendSamsungAC(samsungState);
+    //         delay(2000);
+    //     }
 
-        // delay(500); // 刷新间隔，防止刷屏太快
-
-        // if(button.A.pressed()) // 按键A被按下
-        // {
-        //     Serial0.println("NEC");
-        //     irsend.sendNEC(0x00FFE01FUL);
-        //     delay(2000);
-        //     Serial0.println("Sony");
-        //     irsend.sendSony(0xa90, 12, 2);  // 12 bits & 2 repeats
-        //     delay(2000);
-        //     Serial0.println("a rawData capture from IRrecvDumpV2");
-        //     irsend.sendRaw(rawData, 67, 38);  // Send a raw data capture at 38kHz.
-        //     delay(2000);
-        //     Serial0.println("a Samsung A/C state from IRrecvDumpV2");
-        //     irsend.sendSamsungAC(samsungState);
-        //     delay(2000);
-        // }
-
-        // if (irrecv.decode(&results)) {
-        //     // 直接用 Serial.printf 打印 uint64_t
-        //     Serial0.printf("0x%llX\n", results.value);
-        //     irrecv.resume();  // Receive the next value
-        // }
+    //     if (irrecv.decode(&results)) {
+    //         // 直接用 Serial.printf 打印 uint64_t
+    //         Serial0.printf("0x%llX\n", results.value);
+    //         irrecv.resume();  // Receive the next value
+    //     }
     //     delay(500);          
     // }
 }

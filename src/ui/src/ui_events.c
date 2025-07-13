@@ -4,9 +4,10 @@
 // Project name: SquareLine_Project
 
 #include "ui.h"
-
+#include "Arduino.h"
 void power_off(lv_event_t * e)
 {
 	// Your code here
-	//digitalWrite(11,LOW); // 执行关机操作
+	pinMode(11,OUTPUT);
+	digitalWrite(11,LOW); // 执行关机操作
 }

@@ -64,19 +64,6 @@ static void button_event_cb(lv_event_t * e)
     if (code == LV_EVENT_CLICKED) {
     selected_app_index = lv_obj_get_index(obj);
 
-    // 如果已有标签，先删除
-    if (index_label) {
-        lv_obj_del(index_label);
-        index_label = NULL;
-    }
-
-    // 创建新的标签
-    index_label = lv_label_create(lv_scr_act());
-    char buf[64];
-    snprintf(buf, sizeof(buf), "App Index: %d", selected_app_index);
-    lv_label_set_text(index_label, buf);
-    lv_obj_align(index_label, LV_ALIGN_BOTTOM_MID, 0, -10);
-    lv_obj_set_style_text_color(index_label, lv_color_white(), LV_PART_MAIN);
 }
 
 }

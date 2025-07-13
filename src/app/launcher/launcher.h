@@ -14,10 +14,7 @@
 #include <mooncake.h>
 using namespace mooncake;
 #include "bsp/devices.h"
-#include <memory>
-#if __cplusplus <= 201103L
-namespace std {template <typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args) {return std::unique_ptr<T>(new T(std::forward<Args>(args)...));}}
-#endif
+#include "ChappieLvgl.hpp"
 
 extern int selected_app_index;
 
@@ -64,16 +61,21 @@ namespace MOONCAKE
             
             std::unique_ptr<Mooncake> _mooncake = nullptr;
             DEVICES *_device = nullptr;
+            ChappieLvgl lvgl;
 
         public:
              Launcher(DEVICES* device) : _device(device) {}
              void onCreate();
+             void onRestart();
              void onloop();
              void onDestroy();
 
         public:
             void updateDeviceStatus();
             void updateAPPManager();
+
+        private:
+            bool _lvgl_inited = false;
 
         };
     }
