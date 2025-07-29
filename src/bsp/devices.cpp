@@ -76,7 +76,7 @@ void DEVICES::init()
     Lcd.setFont(&fonts::efontCN_16);
     Lcd.setCursor(0, 0);
     Lcd.printf(" \n BSP %s :)\n Author: Mingo@whitecliff\n", BSP_VERISON);
-    Lcd.printf(" Project: %s\n", PROJECT_NAME);
+    //Lcd.printf(" Project: %s\n", PROJECT_NAME);
 
     // I2C设备检测（带重试）
     for (size_t i = 0; i < i2c_dev_count; ++i) {
@@ -127,23 +127,45 @@ void DEVICES::init()
     pinMode(HAL_PIN_IR_TX, OUTPUT);
     digitalWrite(HAL_PIN_IR_TX, LOW);
 
-    // 检测A键
+    irsend.begin();
+    delay(1000); // 等待红外发送器稳定
+
+    // 检测A键并发射红外
     Lcd.printf(" 请按下A键...");
-    while (1) {
+    while (true) {
         button.A.read();
         if (button.A.pressed()) {
             Lcd.printf(" A键 OK\n");
+            Serial0.println("NEC");
+            irsend.sendNEC(0x00FFE01FUL);
+            delay(2000);
             break;
         }
         delay(10);
     }
 
+    
+
     // 检测B键
     Lcd.printf(" 请按下B键...");
-    while (1) {
+    while (true) {
         button.B.read();
         if (button.B.pressed()) {
             Lcd.printf(" B键 OK\n");
+            break;
+        }
+        delay(10);
+    }
+
+    // 等待红外信号接收
+    Lcd.printf(" 等待红外信号...");
+    irrecv.enableIRIn(); // 启动红外接收
+    delay(1000); // 等待红外接收器稳定
+    while (true) {
+        if (irrecv.decode(&results)) {
+            Serial0.printf("0x%llX\n", results.value);
+            irrecv.resume();  // Receive the next value
+            Lcd.printf("\r接收OK\n");
             break;
         }
         delay(10);
